@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
-  TextInput,
   FlatList,
   TouchableOpacity,
   KeyboardAvoidingView,
@@ -10,12 +9,15 @@ import {
   LayoutAnimation,
   UIManager,
 } from "react-native";
-import { useFocusEffect } from "@react-navigation/native";
+import { deleteDevice } from "@/database";
 
-import * as Print from "expo-print";
-import * as Sharing from "expo-sharing";
+import { useFocusEffect } from "@react-navigation/native";
 import { fetchDevices } from "@/database";
-import { styles } from "@/styles/secound";
+import { DeviceCard } from "@/components/Cards/DeviceCard";
+import { FilterBox } from "@/components/Filters/FilterBox";
+import { generateDevicePDF } from "@/utils/pdf";
+import { useDeviceFilters } from "@/hooks/useDeviceFilters";
+import { MaterialIcons, Feather } from "@expo/vector-icons";
 
 if (
   Platform.OS === "android" &&
@@ -24,29 +26,21 @@ if (
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-interface Device {
-  imei: string;
-  brand: string;
-  model: string;
-  status: string;
-  color: string;
-  size: string;
-}
-
-const allBrands = ["Todos", "Apple", "Samsung", "Xiaomi", "Motorola"];
-const allStatus = ["Todos", "Novo", "Seminovo", "Usado"];
-const allSizes = ["Todos", "32GB", "64GB", "128GB", "256GB", "512GB", "1TB"];
-
 export default function SearchDeviceScreen() {
-  const [devices, setDevices] = useState<Device[]>([]);
-  const [filteredDevices, setFilteredDevices] = useState<Device[]>([]);
-
-  const [imeiSearch, setImeiSearch] = useState("");
-  const [brandFilter, setBrandFilter] = useState("Todos");
-  const [statusFilter, setStatusFilter] = useState("Todos");
-  const [sizeFilter, setSizeFilter] = useState("Todos");
-
+  const [devices, setDevices] = useState<any[]>([]);
+  const [filteredDevices, setFilteredDevices] = useState<any[]>([]);
   const [filtersVisible, setFiltersVisible] = useState(false);
+
+  const {
+    imeiSearch,
+    setImeiSearch,
+    brandFilter,
+    setBrandFilter,
+    statusFilter,
+    setStatusFilter,
+    sizeFilter,
+    setSizeFilter,
+  } = useDeviceFilters();
 
   useFocusEffect(
     React.useCallback(() => {
@@ -55,26 +49,23 @@ export default function SearchDeviceScreen() {
         setDevices(all);
         setFilteredDevices(all);
       };
-
       loadDevices();
     }, [])
   );
+
   const toggleFilters = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setFiltersVisible(!filtersVisible);
   };
 
   const applyFilters = () => {
-    const filtered = devices.filter((device) => {
-      const matchImei = device.imei.includes(imeiSearch.trim());
-      const matchBrand =
-        brandFilter === "Todos" || device.brand === brandFilter;
-      const matchStatus =
-        statusFilter === "Todos" || device.status === statusFilter;
-      const matchSize = sizeFilter === "Todos" || device.size === sizeFilter;
+    const filtered = devices.filter((d) => {
+      const matchImei = d.imei.includes(imeiSearch.trim());
+      const matchBrand = brandFilter === "Todos" || d.brand === brandFilter;
+      const matchStatus = statusFilter === "Todos" || d.status === statusFilter;
+      const matchSize = sizeFilter === "Todos" || d.size === sizeFilter;
       return matchImei && matchBrand && matchStatus && matchSize;
     });
-
     setFilteredDevices(filtered);
   };
 
@@ -86,197 +77,126 @@ export default function SearchDeviceScreen() {
     setFilteredDevices(devices);
   };
 
-  const handleGeneratePDF = async () => {
-    if (filteredDevices.length === 0) {
-      alert("Nenhum dispositivo para gerar relatório.");
-      return;
-    }
-
-    const html = `
-    <html>
-      <head>
-        <meta charset="utf-8" />
-        <style>
-          body { font-family: sans-serif; padding: 16px; }
-          h1 { color: #0D6E6D; }
-          table { width: 100%; border-collapse: collapse; margin-top: 16px; }
-          th, td { border: 1px solid #ccc; padding: 8px; text-align: left; font-size: 12px; }
-          th { background-color: #f0f0f0; }
-        </style>
-      </head>
-      <body>
-        <h1>Relatório de Dispositivos</h1>
-        <table>
-          <thead>
-            <tr>
-              <th>IMEI</th>
-              <th>Marca</th>
-              <th>Modelo</th>
-              <th>Status</th>
-              <th>Cor</th>
-              <th>Tamanho</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${filteredDevices
-              .map(
-                (d) => `
-              <tr>
-                <td>${d.imei}</td>
-                <td>${d.brand}</td>
-                <td>${d.model}</td>
-                <td>${d.status}</td>
-                <td>${d.color}</td>
-                <td>${d.size}</td>
-              </tr>
-            `
-              )
-              .join("")}
-          </tbody>
-        </table>
-      </body>
-    </html>
-  `;
-
-    const { uri } = await Print.printToFileAsync({ html });
-    await Sharing.shareAsync(uri, { mimeType: "application/pdf" });
-  };
-
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={{ flex: 1, padding: 16, backgroundColor: "#F9FAFB" }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      {/* Botão Filtros */}
-      <TouchableOpacity style={styles.filterToggle} onPress={toggleFilters}>
-        <Text style={styles.filterToggleText}>📂 Filtros</Text>
+      <TouchableOpacity
+        onPress={toggleFilters}
+        style={{ marginBottom: 12, flexDirection: "row", alignItems: "center" }}
+      >
+        <Feather
+          name="filter"
+          size={20}
+          color="#111"
+          style={{ marginRight: 6 }}
+        />
+        <Text style={{ fontWeight: "600", fontSize: 16 }}>Filtros</Text>
       </TouchableOpacity>
 
-      {/* Filtros colapsáveis */}
       {filtersVisible && (
-        <View style={styles.filtersBox}>
-          {/* Campo IMEI */}
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>IMEI</Text>
-            <TextInput
-              placeholder="Digite o IMEI..."
-              value={imeiSearch}
-              onChangeText={setImeiSearch}
-              style={styles.input}
-            />
-          </View>
-
-          {/* Chips */}
-          <Text style={styles.label}>Marca</Text>
-          <View style={styles.chipContainer}>
-            {allBrands.map((item) => (
-              <TouchableOpacity
-                key={item}
-                onPress={() => setBrandFilter(item)}
-                style={[
-                  styles.chip,
-                  brandFilter === item && styles.chipSelected,
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.chipText,
-                    brandFilter === item && styles.chipTextSelected,
-                  ]}
-                >
-                  {item}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-
-          <Text style={styles.label}>Status</Text>
-          <View style={styles.chipContainer}>
-            {allStatus.map((item) => (
-              <TouchableOpacity
-                key={item}
-                onPress={() => setStatusFilter(item)}
-                style={[
-                  styles.chip,
-                  statusFilter === item && styles.chipSelected,
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.chipText,
-                    statusFilter === item && styles.chipTextSelected,
-                  ]}
-                >
-                  {item}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-
-          <Text style={styles.label}>Tamanho</Text>
-          <View style={styles.chipContainer}>
-            {allSizes.map((item) => (
-              <TouchableOpacity
-                key={item}
-                onPress={() => setSizeFilter(item)}
-                style={[
-                  styles.chip,
-                  sizeFilter === item && styles.chipSelected,
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.chipText,
-                    sizeFilter === item && styles.chipTextSelected,
-                  ]}
-                >
-                  {item}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-
-          {/* Botões Limpar / Recarregar */}
-          <View style={styles.buttonRow}>
-            <TouchableOpacity style={styles.clearButton} onPress={clearFilters}>
-              <Text style={styles.buttonText}>Limpar</Text>
-            </TouchableOpacity>
+        <View style={{ marginBottom: 12 }}>
+          <FilterBox
+            imeiSearch={imeiSearch}
+            setImeiSearch={setImeiSearch}
+            brandFilter={brandFilter}
+            setBrandFilter={setBrandFilter}
+            statusFilter={statusFilter}
+            setStatusFilter={setStatusFilter}
+            sizeFilter={sizeFilter}
+            setSizeFilter={setSizeFilter}
+          />
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              marginTop: 8,
+            }}
+          >
             <TouchableOpacity
-              style={styles.reloadButton}
-              onPress={applyFilters}
+              onPress={clearFilters}
+              style={{
+                flex: 1,
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: 10,
+                backgroundColor: "#E5E7EB",
+                borderRadius: 6,
+                marginRight: 6,
+              }}
             >
-              <Text style={styles.buttonText}>Recarregar</Text>
+              <MaterialIcons
+                name="clear"
+                size={18}
+                color="#111"
+                style={{ marginRight: 4 }}
+              />
+              <Text>Limpar</Text>
             </TouchableOpacity>
-            <View style={styles.pdfButtonContainer}>
-              <TouchableOpacity
-                style={styles.pdfButton}
-                onPress={handleGeneratePDF}
-              >
-                <Text style={styles.buttonText}>📄 Gerar PDF</Text>
-              </TouchableOpacity>
-            </View>
+
+            <TouchableOpacity
+              onPress={applyFilters}
+              style={{
+                flex: 1,
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: 10,
+                backgroundColor: "#2563EB",
+                borderRadius: 6,
+                marginRight: 6,
+              }}
+            >
+              <Feather
+                name="refresh-cw"
+                size={18}
+                color="#fff"
+                style={{ marginRight: 4 }}
+              />
+              <Text style={{ color: "#fff" }}>Recarregar</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => generateDevicePDF(filteredDevices)}
+              style={{
+                flex: 1,
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: 10,
+                backgroundColor: "#059669",
+                borderRadius: 6,
+              }}
+            >
+              <Feather
+                name="file-text"
+                size={18}
+                color="#fff"
+                style={{ marginRight: 4 }}
+              />
+              <Text style={{ color: "#fff" }}>PDF</Text>
+            </TouchableOpacity>
           </View>
         </View>
       )}
 
-      {/* Lista */}
       <FlatList
         data={filteredDevices}
-        keyExtractor={(item) => item.imei}
+        keyExtractor={(item) => item.id.toString()} // 👈 agora com id
         renderItem={({ item }) => (
-          <View style={styles.deviceCard}>
-            <Text style={styles.deviceTitle}>
-              {item.brand} - {item.model}
-            </Text>
-            <Text style={styles.deviceDetail}>IMEI: {item.imei}</Text>
-            <Text style={styles.deviceDetail}>Status: {item.status}</Text>
-            <Text style={styles.deviceDetail}>Cor: {item.color}</Text>
-            <Text style={styles.deviceDetail}>Tamanho: {item.size}</Text>
-          </View>
+          <DeviceCard
+            device={item}
+            onEdit={(d) => alert(`Editar ${d.imei}`)}
+            onDelete={async (id) => {
+              await deleteDevice(Number(id));
+              setDevices((prev) => prev.filter((d) => d.id !== id));
+              setFilteredDevices((prev) => prev.filter((d) => d.id !== id));
+            }}
+          />
         )}
-        ListEmptyComponent={
-          <Text style={styles.noResult}>Nenhum dispositivo encontrado</Text>
-        }
+        ListEmptyComponent={<Text>Nenhum dispositivo encontrado</Text>}
       />
     </KeyboardAvoidingView>
   );

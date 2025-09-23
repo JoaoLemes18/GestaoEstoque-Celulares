@@ -1,71 +1,62 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   View,
   Text,
-  TextInput,
-  TouchableOpacity,
   Alert,
+  ScrollView,
   KeyboardAvoidingView,
   Platform,
-  Modal,
 } from "react-native";
-import { CameraView } from "expo-camera";
+import Icon from "react-native-vector-icons/MaterialIcons";
 import { useCamera } from "@/hooks/useCamera";
-import { styles } from "@/styles/register";
+import { useDeviceForm } from "@/hooks/useDeviceForm";
 import { insertDevice } from "@/database";
 import { useDevices } from "@/context/DeviceContext";
+import { FormInput } from "@/components/Forms/FormInput";
+import { OptionGroup } from "@/components/Forms/OptionGroup";
+import { PrimaryButton } from "@/components/Buttons/PrimaryButton";
+import { SuccessButton } from "@/components/Buttons/SuccessButton";
+import { CameraModal } from "@/components/Modals/CameraModal";
+import { validateDevice } from "@/utils/validations";
 
-interface Device {
-  imei: string;
-  brand: string;
-  model: string;
-  status: string;
-  color: string;
-  size: string;
-}
-
-interface DeviceFormProps {
-  onDeviceSaved: (device: Device) => void;
-}
-
-export default function Register({ onDeviceSaved }: DeviceFormProps) {
-  const { addDevice } = useDevices(); // ✅ Agora está no lugar certo
-
+export default function Register({
+  onDeviceSaved,
+}: {
+  onDeviceSaved: (device: any) => void;
+}) {
+  const { addDevice } = useDevices();
   const {
     modalIsVisible,
     setModalIsVisible,
     handleOpenCamera,
     handleQrCodeRead,
   } = useCamera();
-
-  const [imei, setImei] = useState("");
-  const [brand, setBrand] = useState("");
-  const [model, setModel] = useState("");
-  const [status, setStatus] = useState("");
-  const [color, setColor] = useState("");
-  const [size, setSize] = useState("");
-
-  const resetForm = () => {
-    setImei("");
-    setBrand("");
-    setModel("");
-    setStatus("");
-    setColor("");
-    setSize("");
-  };
+  const {
+    imei,
+    setImei,
+    brand,
+    setBrand,
+    model,
+    setModel,
+    status,
+    setStatus,
+    color,
+    setColor,
+    size,
+    setSize,
+    resetForm,
+  } = useDeviceForm();
 
   const saveDevice = async () => {
-    if (!imei || !brand || !model || !status || !color || !size) {
+    const newDevice = { imei, brand, model, status, color, size };
+    if (!validateDevice(newDevice)) {
       return Alert.alert("Erro", "Preencha todos os campos");
     }
-
-    const newDevice: Device = { imei, brand, model, status, color, size };
-
     try {
       await insertDevice(imei, brand, model, status, color, size);
       onDeviceSaved(newDevice);
       addDevice(newDevice);
-      resetForm(); // ✅ Limpa todos os inputs
+      resetForm();
       Alert.alert("Sucesso", "Dispositivo salvo com sucesso!");
     } catch (error) {
       Alert.alert("Erro", "Falha ao salvar o dispositivo.");
@@ -75,89 +66,86 @@ export default function Register({ onDeviceSaved }: DeviceFormProps) {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={{ flex: 1, backgroundColor: "#F9FAFB" }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <TouchableOpacity style={styles.button} onPress={handleOpenCamera}>
-        <Text style={styles.buttonText}>Ler Código de Barras</Text>
-      </TouchableOpacity>
-
-      {["IMEI", "Modelo", "Cor"].map((label, i) => (
-        <View key={i} style={styles.inputContainer}>
-          <Text style={styles.label}>{label}</Text>
-          <TextInput
-            placeholder={`Digite o ${label.toLowerCase()}`}
-            value={[imei, model, color][i]}
-            onChangeText={[setImei, setModel, setColor][i]}
-            style={styles.input}
-          />
-        </View>
-      ))}
-
-      {[
-        {
-          label: "Marca",
-          value: brand,
-          setValue: setBrand,
-          options: ["Apple", "Samsung", "Xiaomi", "Motorola"],
-        },
-        {
-          label: "Status",
-          value: status,
-          setValue: setStatus,
-          options: ["Novo", "Seminovo", "Usado"],
-        },
-        {
-          label: "Tamanho",
-          value: size,
-          setValue: setSize,
-          options: ["32GB", "64GB", "128GB", "256GB", "512GB", "1TB"],
-        },
-      ].map((field, index) => (
-        <View key={index} style={styles.inputContainer}>
-          <Text style={styles.label}>{field.label}</Text>
-          <View style={styles.buttonGroup}>
-            {field.options.map((option, idx) => (
-              <TouchableOpacity
-                key={idx}
-                style={[
-                  styles.optionButton,
-                  field.value === option && {
-                    backgroundColor: "blue",
-                    color: "white",
-                  },
-                ]}
-                onPress={() => field.setValue(option)}
-              >
-                <Text style={styles.optionButtonText}>{option}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-      ))}
-
-      <TouchableOpacity style={styles.button} onPress={saveDevice}>
-        <Text style={styles.buttonText}>Salvar</Text>
-      </TouchableOpacity>
-
-      <Modal visible={modalIsVisible} animationType="slide">
-        <CameraView
-          style={{ flex: 1 }}
-          onBarcodeScanned={(scannedData) => {
-            const imeiFromBarcode = handleQrCodeRead(scannedData);
-            setImei(imeiFromBarcode);
-            setModalIsVisible(false);
+      <ScrollView contentContainerStyle={{ padding: 20 }}>
+        <Text
+          style={{
+            fontSize: 24,
+            fontWeight: "700",
+            marginBottom: 20,
+            color: "#111827",
           }}
+        >
+          Cadastro de Itens
+        </Text>
+
+        {/* Botão de abrir câmera */}
+        <PrimaryButton
+          label="Ler Código de Barras"
+          onPress={handleOpenCamera}
+          icon={<Icon name="qr-code-scanner" size={20} color="#fff" />}
         />
-        <View style={styles.footer}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => setModalIsVisible(false)}
-          >
-            <Text style={styles.buttonText}>Cancelar</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
+
+        {/* Inputs */}
+        <FormInput
+          label="IMEI"
+          value={imei}
+          onChange={setImei}
+          icon={<Icon name="qr-code" size={18} color="#6B7280" />}
+        />
+        <FormInput
+          label="Modelo"
+          value={model}
+          onChange={setModel}
+          icon={<Icon name="phone-android" size={18} color="#6B7280" />}
+        />
+        <FormInput
+          label="Cor"
+          value={color}
+          onChange={setColor}
+          icon={<Icon name="palette" size={18} color="#6B7280" />}
+        />
+
+        {/* Grupos de opções */}
+        <OptionGroup
+          label="Marca"
+          value={brand}
+          setValue={setBrand}
+          options={["Apple", "Samsung", "Xiaomi", "Motorola"]}
+        />
+        <OptionGroup
+          label="Status"
+          value={status}
+          setValue={setStatus}
+          options={["Novo", "Seminovo", "Usado"]}
+        />
+        <OptionGroup
+          label="Tamanho"
+          value={size}
+          setValue={setSize}
+          options={["64GB", "128GB", "256GB", "512GB", "1TB", "2TB"]}
+        />
+
+        {/* Botão salvar */}
+        <SuccessButton
+          label="Salvar"
+          onPress={saveDevice}
+          icon={<Icon name="save-alt" size={20} color="#fff" />}
+        />
+      </ScrollView>
+
+      {/* Modal da câmera */}
+      <CameraModal
+        visible={modalIsVisible}
+        onClose={() => setModalIsVisible(false)}
+        onScanned={(scannedData) => {
+          const imeiFromBarcode = handleQrCodeRead(scannedData);
+          setImei(imeiFromBarcode);
+          setModalIsVisible(false);
+        }}
+      />
     </KeyboardAvoidingView>
   );
 }
