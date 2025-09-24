@@ -50,7 +50,6 @@ Ele permite cadastrar, editar, remover, filtrar e exportar relatórios de dispos
     │── scripts/                # Scripts auxiliares
     │── types/                  # Tipos TypeScript (ex: Device)
     │── utils/                  # Utilitários (ex: geração de PDF)
-    │
     │── .gitignore
     │── app.json
     │── package.json
