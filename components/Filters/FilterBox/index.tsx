@@ -1,6 +1,17 @@
 import { View, TextInput, StyleSheet } from "react-native";
 import { FilterChips } from "@/components/Filters/FilterChips";
 
+type FilterBoxProps = {
+  imeiSearch: string;
+  setImeiSearch: (text: string) => void;
+  brandFilter: string;
+  setBrandFilter: (val: string) => void;
+  statusFilter: string;
+  setStatusFilter: (val: string) => void;
+  sizeFilter: string;
+  setSizeFilter: (val: string) => void;
+};
+
 export const FilterBox = ({
   imeiSearch,
   setImeiSearch,
@@ -10,7 +21,7 @@ export const FilterBox = ({
   setStatusFilter,
   sizeFilter,
   setSizeFilter,
-}: any) => (
+}: FilterBoxProps) => (
   <View style={styles.box}>
     <TextInput
       placeholder="Digite o IMEI..."
@@ -37,7 +48,7 @@ export const FilterBox = ({
       label="Tamanho"
       value={sizeFilter}
       onChange={setSizeFilter}
-      options={["Todos", "32GB", "64GB", "128GB", "256GB", "512GB", "1TB"]}
+      options={["Todos", "64GB", "128GB", "256GB", "512GB", "1TB", "2TB"]}
     />
   </View>
 );
@@ -54,4 +65,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default FilterChips;
+export default FilterBox;

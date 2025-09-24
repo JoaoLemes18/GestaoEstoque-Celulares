@@ -1,4 +1,3 @@
-// utils/validations.ts
 export function validateDevice(device: any) {
   const { imei, brand, model, status, color, size } = device;
 
