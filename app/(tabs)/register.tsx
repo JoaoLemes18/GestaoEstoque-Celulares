@@ -155,19 +155,29 @@ export default function Register({
             label="IMEI"
             value={imei}
             onChange={setImei}
-            icon={<Icon name="qr-code" size={20} color={colors.textSecondary} />}
+            icon={
+              <Icon name="qr-code" size={20} color={colors.textSecondary} />
+            }
           />
           <FormInput
             label="Modelo"
             value={model}
             onChange={setModel}
-            icon={<Icon name="phone-android" size={20} color={colors.textSecondary} />}
+            icon={
+              <Icon
+                name="phone-android"
+                size={20}
+                color={colors.textSecondary}
+              />
+            }
           />
           <FormInput
             label="Cor"
             value={color}
             onChange={setColor}
-            icon={<Icon name="palette" size={20} color={colors.textSecondary} />}
+            icon={
+              <Icon name="palette" size={20} color={colors.textSecondary} />
+            }
           />
 
           {/* Grupos de opções */}
@@ -187,7 +197,7 @@ export default function Register({
             label="Tamanho"
             value={size}
             setValue={setSize}
-            options={[ "64GB", "128GB", "256GB", "512GB", "1TB", "2TB"]}
+            options={["64GB", "128GB", "256GB", "512GB", "1TB", "2TB"]}
           />
 
           {/* Botão Salvar */}

@@ -2,31 +2,23 @@ import React, { useState } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import RegisterScreen from "./register";
 import Secound from "./secound";
-import { Ionicons } from "react-native-vector-icons";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import { Device } from "@/types/device";
 
 const Tab = createBottomTabNavigator();
 
-interface Device {
-  imei: string;
-  brand: string;
-  model: string;
-  status: string;
-  color: string;
-  size: string;
-}
-
 const Tabs = () => {
-  const [devices, setDevices] = useState<Device[]>([]); // Estado com tipo explícito
+  const [devices, setDevices] = useState<Device[]>([]);
 
   const handleDeviceSaved = (device: Device) => {
-    setDevices((prevDevices) => [...prevDevices, device]); // Adiciona o dispositivo
+    setDevices((prevDevices) => [...prevDevices, device]);
   };
 
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
-          let iconName;
+          let iconName: string;
 
           if (route.name === "Cadastro de Itens") {
             iconName = focused ? "add-circle" : "add-circle-outline";
@@ -43,6 +35,7 @@ const Tabs = () => {
       <Tab.Screen
         name="Cadastro de Itens"
         children={() => <RegisterScreen onDeviceSaved={handleDeviceSaved} />}
+        options={{ headerShown: false }} // 👈 título removido
       />
       <Tab.Screen
         name="Itens Cadastrados"
