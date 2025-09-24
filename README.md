@@ -78,7 +78,7 @@ Ele permite cadastrar, editar, remover, filtrar e exportar relatórios de dispos
 <p align="center">
 <img src="./docs/screens/ap1.jpg" alt="Tela de Cadastro" width="250"/>
 <img src="./docs/screens/ap2.jpg" alt="Tela da Camera" width="250"/>
-<img src="./docs/screens/ap3.jpg" alt=" Tela após Cadastro" width="250"/>
+<img src="./docs/screens/ops.jpg" alt=" Tela após Cadastro" width="250"/>
 </p>
 
 ### 📋 Listagem de Dispositivos
