@@ -9,7 +9,7 @@
 
 ## 📖 Sobre o Projeto
 
-O **Device Manager** é um aplicativo desenvolvido como **MVP (Minimum Viable Product)** para gerenciamento de dispositivos (smartphones).  
+O **Gerenciador de Dispositivos** é um aplicativo desenvolvido como **MVP (Minimum Viable Product)** para gerenciamento de estoque de dispositivos (smartphones).  
 Ele permite cadastrar, editar, remover, filtrar e exportar relatórios de dispositivos em **PDF**, servindo como prova de conceito para validar a ideia.
 
 ------------------------------------------------------------------------
@@ -21,9 +21,10 @@ Ele permite cadastrar, editar, remover, filtrar e exportar relatórios de dispos
 -   *React Native + Expo + TypeScript*
 -   *SQLite* como banco de dados local
 -   *Expo Router* para navegação
--   *React Native Toast Message* para feedback ao usuário
--   *Expo Vector Icons* para ícones
--   *PDF Generator* para relatórios em PDF
+-   *Expo Camera* para captura de imagens e leitura de QR Codes/IMEI
+-   *PDF Export (Expo Print & Sharing)* exportação de conteúdos em PDF
+-   Hooks e Context API para gerenciamento de estado
+
 
 ### Backend (futuras evoluções)
 
@@ -50,7 +51,6 @@ Ele permite cadastrar, editar, remover, filtrar e exportar relatórios de dispos
     │── scripts/                # Scripts auxiliares
     │── types/                  # Tipos TypeScript (ex: Device)
     │── utils/                  # Utilitários (ex: geração de PDF)
-    │
     │── .gitignore
     │── app.json
     │── package.json
@@ -74,22 +74,23 @@ Ele permite cadastrar, editar, remover, filtrar e exportar relatórios de dispos
 ## 📸 Screenshots
 
 
-### ✏️ Cadastro e Edição
+### ✏️ Cadastro
 <p align="center">
-  <img src="./docs/screens/cadastro.jpg" alt="Tela de Cadastro" width="250"/>
-  <img src="./docs/screens/edicao.jpg" alt="Tela de Edição" width="250"/>
+<img src="./docs/screens/ap1.jpg" alt="Tela de Cadastro" width="250"/>
+<img src="./docs/screens/ap2.jpg" alt="Tela de Cadastro" width="250"/>
+<img src="./docs/screens/ap3.jpg" alt="Tela de Cadastro" width="250"/>
 </p>
 
 ### 📋 Listagem de Dispositivos
 <p align="center">
-  <img src="./docs/screens/listagem.jpg" alt="Listagem de Dispositivos" width="250"/>
-  <img src="./docs/screens/filtros.jpg" alt="Tela de Filtros" width="250"/>
+  <img src="./docs/screens/ap4.jpg" alt="Listagem de Dispositivos" width="250"/>
+  <img src="./docs/screens/ap5.jpg" alt="Tela de Filtros" width="250"/>
 </p>
 
 
 ### 📄 Exportação em PDF
 <p align="center">
-  <img src="./docs/screens/pdf.jpg" alt="Exportação em PDF" width="250"/>
+  <img src="./docs/screens/ap6.jpg" alt="Exportação em PDF" width="250"/>
 </p>
 
 ------------------------------------------------------------------------
