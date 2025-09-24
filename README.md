@@ -104,7 +104,7 @@ git clone https://github.com/JoaoLemes18/GestaoEstoque-Celulares.git
 
 ### Passo 2 - Instalar dependências
 ```bash
-cd device-manager-mvp
+cd GestaoEstoque-Celulares
 npm install
 ```
 
