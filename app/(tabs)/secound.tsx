@@ -53,6 +53,12 @@ export default function SearchDeviceScreen() {
       const fetch = async () => {
         const all = await loadDevices();
         setFilteredDevices(all);
+
+        Toast.show({
+          type: "info",
+          text1: "Lista carregada",
+          text2: `Foram encontrados ${all.length} dispositivos 📱`,
+        });
       };
       fetch();
     }, [])
@@ -71,6 +77,21 @@ export default function SearchDeviceScreen() {
     });
 
     setFilteredDevices(filtered);
+
+    // Toast dinâmico sempre que filtros mudam
+    if (
+      imeiSearch ||
+      brandFilter !== "Todos" ||
+      statusFilter !== "Todos" ||
+      sizeFilter !== "Todos"
+    ) {
+      Toast.show({
+        type: filtered.length ? "success" : "info",
+        text1: filtered.length
+          ? `Filtros aplicados (${filtered.length})`
+          : "Nenhum resultado encontrado",
+      });
+    }
   }, [imeiSearch, brandFilter, statusFilter, sizeFilter, devices]);
 
   // 🔹 Limpar filtros
@@ -80,6 +101,12 @@ export default function SearchDeviceScreen() {
     setStatusFilter("Todos");
     setSizeFilter("Todos");
     setFilteredDevices(devices);
+
+    Toast.show({
+      type: "info",
+      text1: "Filtros limpos",
+      text2: "Todos os dispositivos foram exibidos novamente 🗑️",
+    });
   };
 
   // 🔹 Excluir item
@@ -87,7 +114,17 @@ export default function SearchDeviceScreen() {
     const removed = await removeDevice(id);
     if (removed) {
       setFilteredDevices((prev) => prev.filter((d) => d.id !== id));
-      Toast.show({ type: "success", text1: "Dispositivo removido" });
+      Toast.show({
+        type: "success",
+        text1: "Dispositivo removido",
+        text2: `ID ${id} foi excluído com sucesso ✅`,
+      });
+    } else {
+      Toast.show({
+        type: "error",
+        text1: "Erro ao remover",
+        text2: "Não foi possível excluir o dispositivo ❌",
+      });
     }
   };
 
@@ -101,6 +138,14 @@ export default function SearchDeviceScreen() {
         onPress={() => {
           LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
           setFiltersVisible(!filtersVisible);
+
+          if (!filtersVisible) {
+            Toast.show({
+              type: "info",
+              text1: "Filtros exibidos",
+              text2: "Agora pode refinar sua busca 🔍",
+            });
+          }
         }}
         style={{ marginBottom: 12, flexDirection: "row", alignItems: "center" }}
       >
@@ -142,13 +187,18 @@ export default function SearchDeviceScreen() {
               onPress={() => {
                 if (filteredDevices.length === 0) {
                   Toast.show({
-                    type: "warning",
+                    type: "info",
                     text1: "Nada para exportar",
+                    text2: "A lista está vazia ❌",
                   });
                   return;
                 }
                 generateDevicePDF(filteredDevices);
-                Toast.show({ type: "success", text1: "PDF gerado" });
+                Toast.show({
+                  type: "success",
+                  text1: "PDF gerado",
+                  text2: "Relatório exportado com sucesso 📄",
+                });
               }}
               bg="#059669"
               color="#fff"
@@ -164,7 +214,14 @@ export default function SearchDeviceScreen() {
         renderItem={({ item }) => (
           <DeviceCard
             device={item}
-            onEdit={(d) => setEditingDevice(d)}
+            onEdit={(d) => {
+              setEditingDevice(d);
+              Toast.show({
+                type: "info",
+                text1: "Modo edição",
+                text2: `Você está editando o dispositivo ${d.imei} ✏️`,
+              });
+            }}
             onDelete={handleDelete}
           />
         )}
@@ -188,6 +245,12 @@ export default function SearchDeviceScreen() {
             prev.map((d) => (d.id === updated.id ? updated : d))
           );
           setEditingDevice(null);
+
+          Toast.show({
+            type: "success",
+            text1: "Dispositivo atualizado",
+            text2: `O dispositivo ${updated.imei} foi salvo com sucesso ✅`,
+          });
         }}
       />
     </KeyboardAvoidingView>
