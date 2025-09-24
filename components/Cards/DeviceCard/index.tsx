@@ -12,28 +12,49 @@ export const DeviceCard = ({
   onDelete: (id: number) => void;
 }) => (
   <View style={styles.card}>
+    {/* Informações principais */}
     <View style={{ flex: 1 }}>
       <Text style={styles.title}>
         {device.brand} - {device.model}
       </Text>
-      <Text style={styles.detail}>IMEI: {device.imei}</Text>
-      <Text style={styles.detail}>Status: {device.status}</Text>
-      <Text style={styles.detail}>Cor: {device.color}</Text>
-      <Text style={styles.detail}>Tamanho: {device.size}</Text>
+
+      <View style={styles.infoRow}>
+        <Feather name="smartphone" size={14} color="#6B7280" />
+        <Text style={styles.label}>IMEI:</Text>
+        <Text style={styles.value}>{device.imei}</Text>
+      </View>
+
+      <View style={styles.infoRow}>
+        <Feather name="activity" size={14} color="#6B7280" />
+        <Text style={styles.label}>Status:</Text>
+        <Text style={styles.value}>{device.status}</Text>
+      </View>
+
+      <View style={styles.infoRow}>
+        <Feather name="droplet" size={14} color="#6B7280" />
+        <Text style={styles.label}>Cor:</Text>
+        <Text style={styles.value}>{device.color}</Text>
+      </View>
+
+      <View style={styles.infoRow}>
+        <Feather name="hard-drive" size={14} color="#6B7280" />
+        <Text style={styles.label}>Tamanho:</Text>
+        <Text style={styles.value}>{device.size}</Text>
+      </View>
     </View>
 
     {/* Botões de ação */}
     <View style={styles.actions}>
       <TouchableOpacity
-        onPress={() => onEdit(device)} // 👈 passa o objeto inteiro
-        style={styles.editBtn}
+        onPress={() => onEdit(device)}
+        style={[styles.actionBtn, styles.editBtn]}
       >
         <Feather name="edit-2" size={18} color="#fff" />
       </TouchableOpacity>
 
       <TouchableOpacity
-        onPress={() => onDelete(device.id)} // 👈 aqui sim só o id
-        style={styles.deleteBtn}
+        onPress={() => onDelete(device.id)}
+        style={[styles.actionBtn, styles.deleteBtn]}
       >
         <MaterialIcons name="delete" size={20} color="#fff" />
       </TouchableOpacity>
@@ -45,38 +66,58 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: "row",
     backgroundColor: "#fff",
-    padding: 14,
-    borderRadius: 8,
-    marginBottom: 10,
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
     shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 1 },
-    shadowRadius: 2,
-    elevation: 1,
+    shadowOpacity: 0.08,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
   },
   title: {
-    fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 4,
-    color: "#111827",
+    fontSize: 17,
+    fontWeight: "700",
+    marginBottom: 10,
+    color: "#1F2937",
   },
-  detail: {
+  infoRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 4,
+  },
+  label: {
     fontSize: 13,
-    color: "#4B5563",
+    fontWeight: "600", // destaque no label
+    color: "#374151",
+    marginLeft: 6,
+    marginRight: 4,
+  },
+  value: {
+    fontSize: 13,
+    color: "#4B5563", // valor mais suave
   },
   actions: {
-    justifyContent: "space-between",
-    marginLeft: 12,
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: 16,
+  },
+  actionBtn: {
+    padding: 10,
+    borderRadius: 50,
+    marginVertical: 4,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 3,
+    elevation: 2,
   },
   editBtn: {
     backgroundColor: "#2563EB",
-    padding: 8,
-    borderRadius: 6,
-    marginBottom: 6,
   },
   deleteBtn: {
     backgroundColor: "#DC2626",
-    padding: 8,
-    borderRadius: 6,
   },
 });
