@@ -78,7 +78,7 @@ Ele permite cadastrar, editar, remover, filtrar e exportar relatórios de dispos
 <p align="center">
 <img src="./docs/screens/ap1.jpg" alt="Tela de Cadastro" width="250"/>
 <img src="./docs/screens/ap2.jpg" alt="Tela da Camera" width="250"/>
-<img src="./docs/screens/ap3.jpg" alt=" Tela após Cadastro" width="250"/>
+<img src="./docs/screens/ops.jpg" alt=" Tela após Cadastro" width="250"/>
 </p>
 
 ### 📋 Listagem de Dispositivos
@@ -141,4 +141,5 @@ Abra uma *issue* ou envie um *pull request*.
 
 ## 📄 Licença
 
-Este projeto está sob a licença [MIT](./LICENSE).
+Este projeto foi desenvolvido como **MVP (Minimum Viable Product)** e está licenciado sob a [MIT License](./LICENSE.md).  
+Sinta-se à vontade para utilizar, modificar e compartilhar, dando os devidos créditos. 🚀
