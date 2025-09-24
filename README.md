@@ -9,7 +9,7 @@
 
 ## 📖 Sobre o Projeto
 
-O **Device Manager** é um aplicativo desenvolvido como **MVP (Minimum Viable Product)** para gerenciamento de dispositivos (smartphones).  
+O **Gerenciador de Dispositivos** é um aplicativo desenvolvido como **MVP (Minimum Viable Product)** para gerenciamento de estoque de dispositivos (smartphones).  
 Ele permite cadastrar, editar, remover, filtrar e exportar relatórios de dispositivos em **PDF**, servindo como prova de conceito para validar a ideia.
 
 ------------------------------------------------------------------------
