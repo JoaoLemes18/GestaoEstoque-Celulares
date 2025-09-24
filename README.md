@@ -20,7 +20,7 @@ Ele permite cadastrar, editar, remover, filtrar e exportar relatórios de dispos
 
 -   *React Native + Expo + TypeScript*
 -   *SQLite* como banco de dados local
--   *React Navigation* para navegação
+-   *Expo Router* para navegação
 -   *React Native Toast Message* para feedback ao usuário
 -   *Expo Vector Icons* para ícones
 -   *PDF Generator* para relatórios em PDF
