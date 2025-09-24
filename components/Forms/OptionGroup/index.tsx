@@ -11,26 +11,18 @@ export const OptionGroup = ({
   setValue: (v: string) => void;
   options: string[];
 }) => (
-  <View style={styles.optionContainer}>
+  <View style={styles.container}>
     <Text style={styles.label}>{label}</Text>
-    <View style={styles.optionRow}>
+    <View style={styles.options}>
       {options.map((option, idx) => {
         const selected = value === option;
         return (
           <TouchableOpacity
             key={idx}
             onPress={() => setValue(option)}
-            style={[
-              styles.optionButton,
-              selected && styles.optionButtonSelected,
-            ]}
+            style={[styles.option, selected && styles.selected]}
           >
-            <Text
-              style={[
-                styles.optionButtonText,
-                selected && styles.optionButtonTextSelected,
-              ]}
-            >
+            <Text style={[styles.optionText, selected && styles.selectedText]}>
               {option}
             </Text>
           </TouchableOpacity>
@@ -39,3 +31,4 @@ export const OptionGroup = ({
     </View>
   </View>
 );
+

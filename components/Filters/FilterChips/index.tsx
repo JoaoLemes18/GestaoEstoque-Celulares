@@ -1,45 +1,68 @@
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { colors } from "@/colors";
 
 export const FilterChips = ({
   label,
-  options,
   value,
   onChange,
+  options,
 }: {
   label: string;
-  options: string[];
   value: string;
   onChange: (val: string) => void;
+  options: string[];
 }) => (
-  <View style={{ marginBottom: 12 }}>
+  <View style={styles.container}>
     <Text style={styles.label}>{label}</Text>
-    <View style={styles.chipContainer}>
-      {options.map((opt) => (
-        <TouchableOpacity
-          key={opt}
-          onPress={() => onChange(opt)}
-          style={[styles.chip, value === opt && styles.chipSelected]}
-        >
-          <Text style={[styles.text, value === opt && styles.textSelected]}>
-            {opt}
-          </Text>
-        </TouchableOpacity>
-      ))}
+    <View style={styles.chips}>
+      {options.map((opt) => {
+        const selected = value === opt;
+        return (
+          <TouchableOpacity
+            key={opt}
+            onPress={() => onChange(opt)}
+            style={[styles.chip, selected && styles.chipSelected]}
+          >
+            <Text
+              style={[styles.chipText, selected && styles.chipTextSelected]}
+            >
+              {opt}
+            </Text>
+          </TouchableOpacity>
+        );
+      })}
     </View>
   </View>
 );
 
 const styles = StyleSheet.create({
-  label: { fontWeight: "600", marginBottom: 6 },
-  chipContainer: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
+  container: { marginBottom: 12 },
+  label: {
+    fontWeight: "600",
+    fontSize: 14,
+    marginBottom: 6,
+    color: colors.text,
+  },
+  chips: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
   chip: {
     paddingVertical: 6,
     paddingHorizontal: 12,
-    backgroundColor: "#E5E7EB",
     borderRadius: 16,
-    marginBottom: 6,
+    backgroundColor: colors.border,
   },
-  chipSelected: { backgroundColor: "#2563EB" },
-  text: { fontSize: 14, color: "#111827" },
-  textSelected: { color: "#fff" },
+  chipText: {
+    fontSize: 13,
+    color: colors.text,
+  },
+  chipSelected: {
+    backgroundColor: colors.primary,
+  },
+  chipTextSelected: {
+    color: colors.white,
+    fontWeight: "600",
+  },
 });

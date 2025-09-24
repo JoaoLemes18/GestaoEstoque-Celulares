@@ -9,7 +9,7 @@ export const DeviceCard = ({
 }: {
   device: any;
   onEdit: (device: any) => void;
-  onDelete: (imei: string) => void;
+  onDelete: (id: number) => void;
 }) => (
   <View style={styles.card}>
     <View style={{ flex: 1 }}>
@@ -25,13 +25,14 @@ export const DeviceCard = ({
     {/* Botões de ação */}
     <View style={styles.actions}>
       <TouchableOpacity
-        onPress={() => onEdit(device.id)}
+        onPress={() => onEdit(device)} // 👈 passa o objeto inteiro
         style={styles.editBtn}
       >
         <Feather name="edit-2" size={18} color="#fff" />
       </TouchableOpacity>
+
       <TouchableOpacity
-        onPress={() => onDelete(device.id)}
+        onPress={() => onDelete(device.id)} // 👈 aqui sim só o id
         style={styles.deleteBtn}
       >
         <MaterialIcons name="delete" size={20} color="#fff" />

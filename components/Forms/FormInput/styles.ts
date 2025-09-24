@@ -1,35 +1,25 @@
+// styles.ts
 import { StyleSheet } from "react-native";
+import { colors } from "@/colors";
+
 export const styles = StyleSheet.create({
-  inputContainer: {
-    marginBottom: 16,
-  },
+  inputContainer: { marginBottom: 16 },
   label: {
     fontWeight: "600",
     fontSize: 14,
     marginBottom: 6,
-    color: "#111827",
+    color: colors.text,
   },
   inputWrapper: {
     flexDirection: "row",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#D1D5DB",
     borderRadius: 8,
-    backgroundColor: "#fff",
+    backgroundColor: colors.white,
     paddingHorizontal: 12,
     paddingVertical: 8,
   },
-  icon: {
-    marginRight: 8,
-  },
-  input: {
-    flex: 1,
-    fontSize: 14,
-    color: "#111827",
-  },
-  errorText: {
-    color: "#DC2626",
-    fontSize: 12,
-    marginTop: 4,
-  },
+  icon: { marginRight: 8 },
+  input: { flex: 1, fontSize: 14, color: colors.text },
+  errorText: { color: colors.error, fontSize: 12, marginTop: 4 },
 });

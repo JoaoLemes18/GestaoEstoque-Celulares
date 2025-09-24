@@ -1,4 +1,5 @@
 import { TouchableOpacity, Text, StyleSheet, View } from "react-native";
+import { colors } from "@/colors";
 
 export const SuccessButton = ({
   label,
@@ -7,7 +8,7 @@ export const SuccessButton = ({
 }: {
   label: string;
   onPress: () => void;
-  icon?: React.ReactNode; // 👈 suporte a ícone
+  icon?: React.ReactNode;
 }) => (
   <TouchableOpacity style={styles.button} onPress={onPress}>
     <View style={styles.content}>
@@ -19,7 +20,7 @@ export const SuccessButton = ({
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: "#16A34A",
+    backgroundColor: colors.success,
     padding: 16,
     borderRadius: 8,
     marginVertical: 6,
@@ -29,8 +30,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  icon: {
-    marginRight: 8,
-  },
-  text: { color: "white", fontWeight: "600", textAlign: "center" },
+  icon: { marginRight: 8 },
+  text: { color: colors.white, fontWeight: "600", textAlign: "center" },
 });

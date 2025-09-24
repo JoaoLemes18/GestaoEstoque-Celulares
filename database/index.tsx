@@ -52,6 +52,19 @@ export async function fetchDevices() {
   return result.map((d: DeviceRow) => ({ ...d, id: Number(d.id) })); // 👈 garante number
 }
 
+export async function updateDevice(device: any) {
+  await db.runAsync(
+    "UPDATE devices SET imei=?, brand=?, model=?, status=?, color=?, size=? WHERE id=?;",
+    device.imei,
+    device.brand,
+    device.model,
+    device.status,
+    device.color,
+    device.size,
+    device.id
+  );
+}
+
 export async function deleteDevice(id: number) {
   await db.runAsync("DELETE FROM devices WHERE id = ?;", id);
 }

@@ -9,15 +9,15 @@ import {
   LayoutAnimation,
   UIManager,
 } from "react-native";
-import { deleteDevice } from "@/database";
-
+import { deleteDevice, fetchDevices } from "@/database";
 import { useFocusEffect } from "@react-navigation/native";
-import { fetchDevices } from "@/database";
 import { DeviceCard } from "@/components/Cards/DeviceCard";
 import { FilterBox } from "@/components/Filters/FilterBox";
+import { EditDeviceModal } from "@/components/Modals/EditDeviceModal";
 import { generateDevicePDF } from "@/utils/pdf";
 import { useDeviceFilters } from "@/hooks/useDeviceFilters";
 import { MaterialIcons, Feather } from "@expo/vector-icons";
+import Toast from "react-native-toast-message";
 
 if (
   Platform.OS === "android" &&
@@ -30,6 +30,7 @@ export default function SearchDeviceScreen() {
   const [devices, setDevices] = useState<any[]>([]);
   const [filteredDevices, setFilteredDevices] = useState<any[]>([]);
   const [filtersVisible, setFiltersVisible] = useState(false);
+  const [editingDevice, setEditingDevice] = useState<any | null>(null);
 
   const {
     imeiSearch,
@@ -42,12 +43,27 @@ export default function SearchDeviceScreen() {
     setSizeFilter,
   } = useDeviceFilters();
 
+  // Carregar devices quando a tela ganha foco
   useFocusEffect(
     React.useCallback(() => {
       const loadDevices = async () => {
-        const all = await fetchDevices();
-        setDevices(all);
-        setFilteredDevices(all);
+        try {
+          const all = await fetchDevices();
+          setDevices(all);
+          setFilteredDevices(all);
+
+          Toast.show({
+            type: "info",
+            text1: "Lista carregada",
+            text2: `Foram encontrados ${all.length} dispositivos 📱`,
+          });
+        } catch (error) {
+          Toast.show({
+            type: "error",
+            text1: "Erro ao carregar",
+            text2: "Não foi possível carregar os dispositivos ❌",
+          });
+        }
       };
       loadDevices();
     }, [])
@@ -56,6 +72,13 @@ export default function SearchDeviceScreen() {
   const toggleFilters = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setFiltersVisible(!filtersVisible);
+    Toast.show({
+      type: "info",
+      text1: filtersVisible ? "Filtros ocultos" : "Filtros exibidos",
+      text2: filtersVisible
+        ? "Você ocultou os filtros"
+        : "Agora pode refinar sua busca 🔍",
+    });
   };
 
   const applyFilters = () => {
@@ -67,6 +90,16 @@ export default function SearchDeviceScreen() {
       return matchImei && matchBrand && matchStatus && matchSize;
     });
     setFilteredDevices(filtered);
+
+    Toast.show({
+      type: filtered.length ? "success" : "warning",
+      text1: filtered.length
+        ? "Filtros aplicados"
+        : "Nenhum resultado encontrado",
+      text2: filtered.length
+        ? `Foram encontrados ${filtered.length} dispositivos ✅`
+        : "Tente ajustar os filtros 🔎",
+    });
   };
 
   const clearFilters = () => {
@@ -75,6 +108,32 @@ export default function SearchDeviceScreen() {
     setStatusFilter("Todos");
     setSizeFilter("Todos");
     setFilteredDevices(devices);
+
+    Toast.show({
+      type: "info",
+      text1: "Filtros limpos",
+      text2: "Todos os dispositivos foram exibidos novamente 🗑️",
+    });
+  };
+
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteDevice(Number(id));
+      setDevices((prev) => prev.filter((d) => d.id !== id));
+      setFilteredDevices((prev) => prev.filter((d) => d.id !== id));
+
+      Toast.show({
+        type: "success",
+        text1: "Dispositivo removido",
+        text2: `ID ${id} foi excluído com sucesso ✅`,
+      });
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Erro ao excluir",
+        text2: "Não foi possível excluir o dispositivo ❌",
+      });
+    }
   };
 
   return (
@@ -82,6 +141,7 @@ export default function SearchDeviceScreen() {
       style={{ flex: 1, padding: 16, backgroundColor: "#F9FAFB" }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
+      {/* Botão toggle de filtros */}
       <TouchableOpacity
         onPress={toggleFilters}
         style={{ marginBottom: 12, flexDirection: "row", alignItems: "center" }}
@@ -95,6 +155,7 @@ export default function SearchDeviceScreen() {
         <Text style={{ fontWeight: "600", fontSize: 16 }}>Filtros</Text>
       </TouchableOpacity>
 
+      {/* Box de filtros */}
       {filtersVisible && (
         <View style={{ marginBottom: 12 }}>
           <FilterBox
@@ -107,6 +168,8 @@ export default function SearchDeviceScreen() {
             sizeFilter={sizeFilter}
             setSizeFilter={setSizeFilter}
           />
+
+          {/* Botões de ação */}
           <View
             style={{
               flexDirection: "row",
@@ -159,7 +222,22 @@ export default function SearchDeviceScreen() {
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={() => generateDevicePDF(filteredDevices)}
+              onPress={() => {
+                if (filteredDevices.length === 0) {
+                  Toast.show({
+                    type: "warning",
+                    text1: "Nada para exportar",
+                    text2: "A lista está vazia ❌",
+                  });
+                  return;
+                }
+                generateDevicePDF(filteredDevices);
+                Toast.show({
+                  type: "success",
+                  text1: "PDF gerado",
+                  text2: "Relatório exportado com sucesso 📄",
+                });
+              }}
               style={{
                 flex: 1,
                 flexDirection: "row",
@@ -182,21 +260,45 @@ export default function SearchDeviceScreen() {
         </View>
       )}
 
+      {/* Lista */}
       <FlatList
         data={filteredDevices}
-        keyExtractor={(item) => item.id.toString()} // 👈 agora com id
+        keyExtractor={(item) => item.id.toString()} // 👈 chave única
         renderItem={({ item }) => (
           <DeviceCard
             device={item}
-            onEdit={(d) => alert(`Editar ${d.imei}`)}
-            onDelete={async (id) => {
-              await deleteDevice(Number(id));
-              setDevices((prev) => prev.filter((d) => d.id !== id));
-              setFilteredDevices((prev) => prev.filter((d) => d.id !== id));
+            onEdit={(d) => {
+              setEditingDevice(d); // abre modal já com dados
+              Toast.show({
+                type: "info",
+                text1: "Modo edição",
+                text2: `Você está editando o dispositivo ${d.imei} ✏️`,
+              });
             }}
+            onDelete={(id) => handleDelete(id)}
           />
         )}
-        ListEmptyComponent={<Text>Nenhum dispositivo encontrado</Text>}
+        ListEmptyComponent={
+          <Text style={{ textAlign: "center", marginTop: 20 }}>
+            Nenhum dispositivo encontrado
+          </Text>
+        }
+      />
+
+      {/* Modal de edição */}
+      <EditDeviceModal
+        visible={!!editingDevice}
+        device={editingDevice}
+        onClose={() => setEditingDevice(null)}
+        onSave={(updated) => {
+          setDevices((prev) =>
+            prev.map((d) => (d.id === updated.id ? updated : d))
+          );
+          setFilteredDevices((prev) =>
+            prev.map((d) => (d.id === updated.id ? updated : d))
+          );
+          setEditingDevice(null);
+        }}
       />
     </KeyboardAvoidingView>
   );
