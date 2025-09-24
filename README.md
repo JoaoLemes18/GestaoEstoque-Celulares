@@ -35,7 +35,7 @@ Ele permite cadastrar, editar, remover, filtrar e exportar relatórios de dispos
 
 ## 📂 Estrutura do Projeto
 
-    DEVICE-MANAGER/
+    GestaoEstoque-Celulares/
     │── app/                    # Arquivos principais do Expo Router / telas
     │── assets/                 # Recursos estáticos (ícones, imagens)
     │── colors/                 # Paleta de cores global
@@ -98,7 +98,7 @@ Ele permite cadastrar, editar, remover, filtrar e exportar relatórios de dispos
 
 ### Passo 1 - Clonar o repositório
 ```bash
-git clone https://github.com/SEU_USUARIO/device-manager-mvp.git
+git clone https://github.com/JoaoLemes18/GestaoEstoque-Celulares.git
 ```
 
 ### Passo 2 - Instalar dependências
