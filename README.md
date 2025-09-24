@@ -141,4 +141,5 @@ Abra uma *issue* ou envie um *pull request*.
 
 ## 📄 Licença
 
-Este projeto está sob a licença [MIT](./LICENSE).
+Este projeto foi desenvolvido como **MVP (Minimum Viable Product)** e está licenciado sob a [MIT License](./LICENSE.md).  
+Sinta-se à vontade para utilizar, modificar e compartilhar, dando os devidos créditos. 🚀
